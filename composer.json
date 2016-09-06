@@ -1,0 +1,13 @@
+{
+    "name": "sagar/outlook-php",
+    "description": "The api to handle outlook rest api using php",
+    "keywords": ["php-rest-outlook", "outlook"],
+    "license": "MIT",
+    "type": "package",
+    "require": {
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "config": {
+        "preferred-install": "dist"
+    }
+}
