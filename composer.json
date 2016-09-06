@@ -4,10 +4,19 @@
     "keywords": ["php-rest-outlook", "outlook"],
     "license": "MIT",
     "type": "package",
+    "authors": [
+        {
+            "name": "Sagar Rabadiya",
+            "email": "sam.coolone70@gmail.com"
+        }
+    ]
     "require": {
         "guzzlehttp/guzzle": "^6.2"
     },
-    "config": {
-        "preferred-install": "dist"
-    }
+    "autoload": {
+        "psr-4": {
+            "Outlook\\": "src/Outlook/"
+        }
+    },
+    "minimum-stability": "dev"
 }
