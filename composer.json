@@ -9,13 +9,14 @@
             "name": "Sagar Rabadiya",
             "email": "sam.coolone70@gmail.com"
         }
-    ]
+    ],
     "require": {
-        "guzzlehttp/guzzle": "^6.2"
+        "guzzlehttp/guzzle": "^6.2",
+        "nesbot/carbon": "^1.21"
     },
     "autoload": {
         "psr-4": {
-            "Outlook\\": "src/Outlook/"
+            "Outlook\\": "src/Outlook"
         }
     },
     "minimum-stability": "dev"
