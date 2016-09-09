@@ -1,6 +1,7 @@
 <?php namespace Outlook\Authorizer;
 
 use GuzzleHttp\Client;
+use Outlook\Authorizer\Contracts\SessionContract;
 use Outlook\Exceptions\Authorizer\ClientException;
 use Outlook\Exceptions\Authorizer\TokenException;
 
@@ -13,33 +14,37 @@ class Authenticator
     /**
      * @var null
      */
-    private $clientId;
+    protected $clientId;
 
     /**
      * @var null
      */
-    private $clientSecret;
+    protected $clientSecret;
 
     /**
      * @var string
      */
-    private $authority = "https://login.microsoftonline.com";
+    protected $authority = "https://login.microsoftonline.com";
 
     /**
      * @var string
      */
-    private $tokenUrl = "/common/oauth2/v2.0/token";
+    protected $tokenUrl = "/common/oauth2/v2.0/token";
 
     /**
      * @var array
      */
-    private $scopes = [];
+    protected $scopes = [];
 
     /**
      * @var string
      */
-    private $redirectUri;
+    protected $redirectUri;
 
+    /**
+     * @var SessionContract
+     */
+    protected $sessionManager;
 
     /**
      * Authenticator constructor.
@@ -83,7 +88,7 @@ class Authenticator
     }
 
     /**
-     * @return bool
+     * @return bool|Token
      * @throws TokenException
      */
     public function getToken()
@@ -99,9 +104,9 @@ class Authenticator
                 ]);
                 // we got token successfully save it to session
                 $tokenResponse = $this->deserialize($response->getBody()->getContents());
-//                var_dump($tokenResponse);
                 $token = $this->buildTokenInstance($tokenResponse);
-                var_dump($token);
+                $this->sessionManager->set($token);
+                return $token;
             } catch (\Exception $e) {
                 throw new TokenException($e->getMessage());
             }
@@ -114,7 +119,7 @@ class Authenticator
      * @param $code
      * @return array
      */
-    private function buildParams($grantType, $code)
+    protected function buildParams($grantType, $code)
     {
         $parameterName = $grantType;
         if (strcmp($parameterName, 'authorization_code') == 0) {
@@ -133,7 +138,7 @@ class Authenticator
     /**
      * @return string
      */
-    private function getAuthorizeUrl()
+    protected function getAuthorizeUrl()
     {
         return '/common/oauth2/v2.0/authorize?client_id=%1$s&redirect_uri=%2$s&response_type=code&scope=%3$s';
     }
@@ -142,7 +147,7 @@ class Authenticator
      * @param $scopes
      * @return string
      */
-    private function formatScopes($scopes)
+    protected function formatScopes($scopes)
     {
         return urlencode(implode(" ", array_unique($scopes)));
     }
@@ -151,24 +156,39 @@ class Authenticator
      * @param $body
      * @return mixed
      */
-    private function deserialize($body)
+    protected function deserialize($body)
     {
-        echo $body;
         return json_decode($body, true);
     }
 
     /**
      * @param $token
      */
-    private function buildTokenInstance($token)
+    protected function buildTokenInstance($token)
     {
-        $token = new Token();
-        $token->setAccessToken($token['access_token']);
-        $token->setRefreshToken($token['refresh_token']);
-        $token->setExpiresIn($token['expires_in']);
-        $token->setExtExpiresIn($token['ext_expires_in']);
-        $token->setIdToken($token['id_token']);
-        $token->setTokenType($token['token_type']);
-        return $token;
+        $tokenInstance = new Token();
+        $tokenInstance->setAccessToken($token['access_token']);
+        $tokenInstance->setRefreshToken($token['refresh_token']);
+        $tokenInstance->setExpiresIn($token['expires_in']);
+        $tokenInstance->setExtExpiresIn($token['ext_expires_in']);
+        $tokenInstance->setIdToken($token['id_token']);
+        $tokenInstance->setTokenType($token['token_type']);
+        return $tokenInstance;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSessionManager()
+    {
+        return $this->sessionManager;
+    }
+
+    /**
+     * @param SessionContract $sessionManager
+     */
+    public function setSessionManager(SessionContract $sessionManager)
+    {
+        $this->sessionManager = $sessionManager;
     }
 }

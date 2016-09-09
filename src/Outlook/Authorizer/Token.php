@@ -17,42 +17,42 @@ class Token
     /**
      * @var string
      */
-    private $accessToken;
+    protected $accessToken;
 
     /**
      * @var string
      */
-    private $refreshToken;
+    protected $refreshToken;
 
     /**
      * @var string
      */
-    private $tokenType;
+    protected $tokenType;
 
     /**
      * @var string
      */
-    private $scopes;
+    protected $scopes;
 
     /**
      * @var integer
      */
-    private $expiresIn;
+    protected $expiresIn;
 
     /**
      * @var integer
      */
-    private $extExpiresIn;
+    protected $extExpiresIn;
 
     /**
      * @var string
      */
-    private $idToken;
+    protected $idToken;
 
     /**
      * @var Carbon
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * Token constructor.
@@ -180,5 +180,13 @@ class Token
     public function isExpired()
     {
         return $this->createdAt->addSeconds($this->expiresIn)->gte(Carbon::now());
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->accessToken;
     }
 }
