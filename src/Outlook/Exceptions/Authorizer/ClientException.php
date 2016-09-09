@@ -10,5 +10,4 @@ use Outlook\Exceptions\OutlookException;
 
 class ClientException extends OutlookException
 {
-
 }

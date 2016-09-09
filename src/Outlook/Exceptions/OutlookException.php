@@ -6,8 +6,6 @@
 
 namespace Outlook\Exceptions;
 
-
 class OutlookException extends \Exception
 {
-
 }
