@@ -4,7 +4,9 @@ A handy tool to work with outlook rest api
 ## example code is available in the examples directory
 
 #### Installation
+```bash 
     composer require sagar/outlook-php
+```
 
 #### Authenticator
 ```php
