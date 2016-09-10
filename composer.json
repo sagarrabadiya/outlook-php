@@ -1,0 +1,26 @@
+{
+    "name": "sagar/outlook-php",
+    "description": "The api to handle outlook rest api using php",
+    "keywords": ["php-rest-outlook", "outlook"],
+    "license": "MIT",
+    "type": "package",
+    "authors": [
+        {
+            "name": "Sagar Rabadiya",
+            "email": "sam.coolone70@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.2",
+        "nesbot/carbon": "^1.21"
+    },
+    "require-dev": {
+        "filp/whoops": "2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Outlook\\": "src/Outlook"
+        }
+    },
+    "minimum-stability": "dev"
+}
