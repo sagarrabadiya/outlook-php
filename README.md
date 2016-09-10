@@ -3,6 +3,9 @@ A handy tool to work with outlook rest api
 
 ## example code is available in the examples directory
 
+#### Installation
+    composer require sagar/outlook-php
+
 #### Authenticator
 ```php
 define('APP_ID', '07cdaba2-7865-4cec-8c82-b6d69679c88c');
@@ -76,6 +79,8 @@ if (!$token) {
     // only outer properties will be converted to Study case automatically
     $event = new \Outlook\Events\Event(['subject' => 'Discuss the Calendar REST API']);
     $event->body = ['ContentType' => 'HTML', 'Content' => 'Hello this is test Event'];
+    $event->start = ["DateTime" => "2014-02-02T18:00:00", "TimeZone" => "Pacific Standard Time"];
+    $event->end = ["DateTime" => "2014-02-02T19:00:00", "TimeZone" => "Pacific Standard Time"];
     $event = $eventManager->create($event);
     var_dump($event);
     
