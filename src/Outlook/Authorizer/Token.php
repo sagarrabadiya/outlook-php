@@ -179,7 +179,10 @@ class Token
      */
     public function isExpired()
     {
-        return $this->createdAt->addSeconds($this->expiresIn)->gte(Carbon::now());
+        if ($this->accessToken) {
+            return $this->createdAt->addSeconds($this->expiresIn)->lte(Carbon::now());
+        }
+        return true;
     }
 
     /**

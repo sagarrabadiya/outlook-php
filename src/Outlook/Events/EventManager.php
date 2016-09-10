@@ -6,10 +6,9 @@
 
 namespace Outlook\Events;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+use Outlook\ApiRequester\Client;
 use Outlook\Authorizer\Token;
-use Outlook\Exceptions\Events\EventCallException;
+use Outlook\Exceptions\Events\RestApiException;
 
 class EventManager
 {
@@ -18,8 +17,10 @@ class EventManager
      */
     protected $token;
 
-
-    protected $apiClient;
+    /**
+     * @var Client
+     */
+    protected $api;
 
     /**
      * EventManager constructor.
@@ -28,53 +29,41 @@ class EventManager
     public function __construct(Token $token)
     {
         $this->token = $token;
-        $this->apiClient = new Client([
-            'base_uri' => 'https://outlook.office.com/api/v2.0',
-            'headers' => [
-                "Authorization" => "{$this->token->getTokenType()} {$this->token->getAccessToken()}",
-                "Accept: application/json"
+        $this->api = new Client(
+            $this->token,
+            'https://outlook.office.com/api/v2.0',
+            [
+                "headers" => [
+                    "Authorization" => "{$this->token->getTokenType()} {$this->token->getAccessToken()}"
+                ]
             ]
-        ]);
-    }
-
-    public function getEvents()
-    {
-        $response = $this->callApi('/me/events', 'get', [
-            '$select' => 'Subject,Organizer,Start,End'
-        ]);
-        return $response;
-    }
-
-    protected function callApi($uri = '/me', $method = "get", $params = [])
-    {
-        $requestOptions = [];
-        if (count($params)) {
-            if ($method === 'get') {
-                $uri .= '?'. $this->buildQuery($params);
-            } else {
-                $requestOptions['form_params'] = $params;
-            }
-        }
-        $request = new Request($method, $uri);
-        try {
-            $response = $this->apiClient->send($request, $requestOptions);
-            var_dump($response->getBody->getContent());
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-//            throw new EventCallException($e->getMessage());
-        }
+        );
     }
 
     /**
-     * @param array $params
-     * @return string
+     * @return array|Event
+     * @throws RestApiException
      */
-    protected function buildQuery($params = [])
+    public function getEvents()
     {
-        $queryString = '';
-        foreach ($params as $key => $value) {
-            $queryString .= "$key=$value&";
+        $response = $this->api->call('/me/events', 'get');
+        if (isset($response->error)) {
+            throw new RestApiException($response->error->message, $response->statusCode);
         }
-        return rtrim($queryString, '&');
+        return $this->parseEvents($response->value);
+    }
+
+    /**
+     * @param array $responseEvents
+     * @return array|Event
+     */
+    public function parseEvents($responseEvents = [])
+    {
+        $events = [];
+        foreach ($responseEvents as $event) {
+            $event = new Event((array) $event);
+            $events[] = new Event((array) $event);
+        }
+        return $events;
     }
 }

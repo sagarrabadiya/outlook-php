@@ -51,9 +51,11 @@ class EventAuthorizer
     public function isAuthenticated()
     {
         $token = $this->sessionManager->get();
-        if ($token) {
+        if ($token && !$token->isExpired()) {
             return $token;
         }
+        // we clean up any existing expired token
+        $this->sessionManager->remove();
         // if not in session we capture code parameter and send request to get token
         return $this->authenticator->getToken();
     }

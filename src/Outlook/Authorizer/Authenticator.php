@@ -56,7 +56,7 @@ class Authenticator
     public function __construct($clientId = null, $clientSecret = null, $redirectUri = null)
     {
         if (is_null($clientId) || is_null($clientSecret)) {
-            throw new ClientException("Client id and client secret is required for outlook!");
+            throw new ClientException("Client id and client secret is required for outlook!", 500, new \Exception);
         }
 
         $this->clientId = $clientId;
@@ -65,6 +65,8 @@ class Authenticator
             $this->redirectUri = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
             // we clean up redirect uri and remove ?code=XXX and other query string params
             $this->redirectUri = str_replace("?{$_SERVER['QUERY_STRING']}", "", $this->redirectUri);
+        } else {
+            $this->redirectUri = $redirectUri;
         }
     }
 
@@ -108,7 +110,7 @@ class Authenticator
                 $this->sessionManager->set($token);
                 return $token;
             } catch (\Exception $e) {
-                throw new TokenException($e->getMessage());
+                throw new TokenException($e->getMessage(), $e->getCode(), $e);
             }
         }
         return false;
