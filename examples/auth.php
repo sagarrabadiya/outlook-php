@@ -14,7 +14,7 @@ $authenticator = new Outlook\Authorizer\Authenticator(CLIEND_ID, CLIEND_SECRET);
 
 $token = $authenticator->getToken();
 
-if(!$token) {
+if (!$token) {
     echo $authenticator->getLoginUrl();
 } else {
     var_dump($token);
