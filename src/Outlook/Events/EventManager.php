@@ -34,7 +34,8 @@ class EventManager
             'https://outlook.office.com/api/v2.0',
             [
                 "headers" => [
-                    "Authorization" => "{$this->token->getTokenType()} {$this->token->getAccessToken()}"
+                    "Authorization" => "{$this->token->getTokenType()} {$this->token->getAccessToken()}",
+                    "Content-Type" => "application/json"
                 ]
             ]
         );
@@ -44,7 +45,7 @@ class EventManager
      * @return array|Event
      * @throws RestApiException
      */
-    public function getEvents()
+    public function all()
     {
         $response = $this->api->call('/me/events', 'get');
         if (isset($response->error)) {
@@ -54,11 +55,73 @@ class EventManager
     }
 
     /**
+     * @param null $eventId
+     * @return array|Event
+     * @throws RestApiException
+     */
+    public function get($eventId = null)
+    {
+        if (is_null($eventId)) {
+            throw new RestApiException('Event Id required to get single event');
+        }
+        $response = $this->api->call("/me/events/{$eventId}", 'get');
+        return $this->parseEvents($response);
+    }
+
+    /**
+     * @param Event $event
+     * @return array|Event
+     */
+    public function create(Event $event)
+    {
+        if ($event->id) {
+            return $this->get($event->id);
+        }
+
+        $response = $this->api->call('/me/events', 'post', $event->toParams());
+        return $this->parseEvents($response);
+    }
+
+    /**
+     * @param Event $event
+     * @return array|Event
+     * @throws RestApiException
+     */
+    public function update(Event $event)
+    {
+        if (! $event->id) {
+            throw new RestApiException('Event id required to update the event');
+        }
+
+        $response = $this->api->call("/me/events/{$event->id}", 'patch', $event->toParams());
+        return $this->parseEvents($response);
+    }
+
+    /**
+     * @param Event $event
+     * @return bool
+     * @throws RestApiException
+     */
+    public function delete(Event $event)
+    {
+        if (! $event->id) {
+            throw new RestApiException('Event id required to delete the event');
+        }
+
+        $this->api->call("/me/events/{$event->id}", 'delete');
+        return true;
+    }
+
+    /**
      * @param array $responseEvents
      * @return array|Event
      */
     public function parseEvents($responseEvents = [])
     {
+        // if direct event is given then return the event object
+        if (is_object($responseEvents)) {
+            return new Event((array) $responseEvents);
+        }
         $events = [];
         foreach ($responseEvents as $event) {
             $event = new Event((array) $event);

@@ -5,7 +5,6 @@
  */
 
 require_once '../vendor/autoload.php';
-require_once 'errorHandler.php'; // whoops page to show error nicely its optional
 
 define('APP_ID', '07cdaba2-7865-4cec-8c82-b6d69679c88c');
 define('APP_PASSWORD', 'qR7tHeUpDhLXiZhPdXaT5aU');
@@ -17,7 +16,7 @@ $authenticator = new Outlook\Authorizer\Authenticator(
 );
 
 $sessionManager = new \Outlook\Authorizer\Session();
-//$sessionManager->remove();
+//$sessionManager->remove(); // if need to remove token manually from session
 
 $eventAuthorizer = new \Outlook\Events\EventAuthorizer($authenticator, $sessionManager);
 
@@ -26,5 +25,33 @@ if (!$token) {
     echo '<a href='.$eventAuthorizer->getLoginUrl().'>Login</a>';
 } else {
     $eventManager = new \Outlook\Events\EventManager($token);
-    var_dump($eventManager->getEvents());
+
+    // get all events returns each item as Event object
+    $events = $eventManager->all();
+
+    foreach ($events as $event) {
+        echo $event->id. " -> ". $event;
+        echo '<br />';
+    }
+
+    // get single event with id
+    $event = $eventManager->get($eventId = 'AQMkADAwATM0MDAAMS1mYWJlLTc2ZDMtMDACLTAwCgBGAAADxtSZX36Ug0qmRAm-Pups1QcAebOFJWlMG0Oc5CRjAVwMrgAAAgENAAAAebOFJWlMG0Oc5CRjAVwMrgAAAiDBAAAA');
+
+    //create event
+    // nested key name must be case sensitive correctly according to their docs.
+    // only outer properties will be converted to Study case automatically
+    $event = new \Outlook\Events\Event(['subject' => 'Discuss the Calendar REST API']);
+    $event->body = ['ContentType' => 'HTML', 'Content' => 'Hello this is test Event'];
+    $event = $eventManager->create($event);
+//    var_dump($event);
+
+    // make sure the properties are in exact same case as defiend in the docs.
+//    $event = $eventManager->get('AQMkADAwATM0MDAAMS1mYWJlLTc2ZDMtMDACLTAwCgBGAAADxtSZX36Ug0qmRAm-Pups1QcAebOFJWlMG0Oc5CRjAVwMrgAAAgENAAAAebOFJWlMG0Oc5CRjAVwMrgAAAAJckAEAAAA=');
+    $event->Body->Content = "new Updated Content";
+    $updateEvent = $eventManager->update($event);
+    var_dump($updateEvent); // event instance with updated values
+
+//    $event = $eventManager->get('AQMkADAwATM0MDAAMS1mYWJlLTc2ZDMtMDACLTAwCgBGAAADxtSZX36Ug0qmRAm-Pups1QcAebOFJWlMG0Oc5CRjAVwMrgAAAgENAAAAebOFJWlMG0Oc5CRjAVwMrgAAAAJckAIAAAA=');
+    $response = $eventManager->delete($event);
+    var_dump($response); // response true or raised exception
 }

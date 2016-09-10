@@ -56,7 +56,7 @@ class Client
             if ($method === 'get') {
                 $uri .= '?'. $this->buildQuery($params);
             } else {
-                $this->requestOptions['form_params'] = $params;
+                $this->requestOptions['json'] = $params;
             }
         }
         $request = new Request($method, $this->baseUri.$uri);
@@ -65,6 +65,8 @@ class Client
             return $this->decode($response);
         } catch (\Exception $e) {
             // catch guzzle exceptions
+            var_dump($e);
+            die();
             return $this->decode($e->getResponse());
         }
     }
@@ -89,8 +91,7 @@ class Client
     protected function decode(ResponseInterface $response)
     {
         $exception = json_decode((string) $response->getBody());
-        $exception->statusCode = $response->getStatusCode();
-
+        @$exception->statusCode = $response->getStatusCode();
         return $exception;
     }
 }
