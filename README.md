@@ -103,7 +103,6 @@ if (!$token) {
 
 # TODO
    * Add support for sync events
-   * Add calendar apis
    * Add contacts apis
    * Add mail apis
 
