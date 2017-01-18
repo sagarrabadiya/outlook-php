@@ -65,8 +65,6 @@ class Client
             return $this->decode($response);
         } catch (\Exception $e) {
             // catch guzzle exceptions
-            var_dump($e);
-            die();
             return $this->decode($e->getResponse());
         }
     }
