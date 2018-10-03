@@ -47,6 +47,18 @@ class CalendarAuthorizer
     /**
      * @return bool|Token
      */
+    public function renewToken()
+    {
+        $token = $this->sessionManager->get();
+        if ($token && !$token->isExpired()) {
+            return $this->authenticator->renewToken($token);
+        }
+        return false;
+    }
+
+    /**
+     * @return bool|Token
+     */
     public function isAuthenticated()
     {
         $token = $this->sessionManager->get();

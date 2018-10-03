@@ -24,6 +24,12 @@ $token = $eventAuthorizer->isAuthenticated();
 if (!$token) {
     echo '<a href='.$eventAuthorizer->getLoginUrl().'>Login</a>';
 } else {
+    if (isset($_GET['refresh_token']) && $_GET['refresh_token']) {
+        $newToken = $eventAuthorizer->renewToken();
+        echo 'Refresh Token: <br />';
+        var_dump($newToken);
+        die();
+    }
     $eventManager = new \Outlook\Events\EventManager($token);
 
     // get all events returns each item as Event object
@@ -56,4 +62,6 @@ if (!$token) {
 //    $event = $eventManager->get('AQMkADAwATM0MDAAMS1mYWJlLTc2ZDMtMDACLTAwCgBGAAADxtSZX36Ug0qmRAm-Pups1QcAebOFJWlMG0Oc5CRjAVwMrgAAAgENAAAAebOFJWlMG0Oc5CRjAVwMrgAAAAJckAIAAAA=');
     $response = $eventManager->delete($event);
     var_dump($response); // response true or raised exception
+
+    echo '<a href="?refresh_token=true">Renew Token</a>';
 }

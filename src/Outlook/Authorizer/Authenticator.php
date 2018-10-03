@@ -80,12 +80,12 @@ class Authenticator
         if (!is_null($redirectUri)) {
             $this->redirectUri = $redirectUri;
         }
-        $this->scopes = $this->formatScopes(array_merge($scopes, ['openid', 'offline_access']));
+        $this->scopes = array_merge($scopes, ['openid', 'offline_access']);
         return $this->authority.sprintf(
             $this->getAuthorizeUrl(),
             $this->clientId,
             urlencode($this->redirectUri),
-            $this->scopes
+            $this->formatScopes($this->scopes)
         );
     }
 
@@ -117,6 +117,47 @@ class Authenticator
     }
 
     /**
+     * Method to get the new access token from existing refresh token
+     *
+     * @return bool|Token
+     * @throws TokenException
+     */
+    public function renewToken(Token $token)
+    {
+        $grantType = 'refresh_token';
+        $code = $token->getRefreshToken();
+        if ($code) {
+            $httpClient = new Client();
+            $params = $this->buildParams($grantType, $code);
+            try {
+                $response = $httpClient->post($this->authority.$this->tokenUrl, [
+                    'form_params' => $params
+                ]);
+                // we got token successfully save it to session
+                $tokenResponse = $this->deserialize($response->getBody()->getContents());
+                $token = $this->buildTokenInstance($tokenResponse);
+                $this->sessionManager->set($token);
+                return $token;
+            } catch (\Exception $e) {
+                throw new TokenException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * function to set scope
+     *
+     * @param array $scopes
+     * @return Authenticator
+     */
+    public function setScopes($scopes = [])
+    {
+        $this->scopes = array_merge($scopes, ['openid', 'offline_access']);
+        return $this;
+    }
+
+    /**
      * @param $grantType
      * @param $code
      * @return array
@@ -126,6 +167,9 @@ class Authenticator
         $parameterName = $grantType;
         if (strcmp($parameterName, 'authorization_code') == 0) {
             $parameterName = 'code';
+        }
+        if (strcmp($parameterName, 'refresh_token') == 0) {
+            $parameterName = 'refresh_token';
         }
         return [
             "grant_type" => $grantType,
