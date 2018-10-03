@@ -50,7 +50,7 @@ class CalendarAuthorizer
     public function renewToken()
     {
         $token = $this->sessionManager->get();
-        if ($token && !$token->isExpired()) {
+        if ($token) {
             return $this->authenticator->renewToken($token);
         }
         return false;
