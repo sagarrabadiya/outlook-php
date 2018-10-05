@@ -73,9 +73,10 @@ class Authenticator
     /**
      * @param array $scopes
      * @param string $redirectUri
+     * @param array $additionalParams
      * @return string
      */
-    public function getLoginUrl($scopes = [], $redirectUri = null)
+    public function getLoginUrl($scopes = [], $redirectUri = null, $additionalParams = [])
     {
         if (!is_null($redirectUri)) {
             $this->redirectUri = $redirectUri;
@@ -86,7 +87,7 @@ class Authenticator
             $this->clientId,
             urlencode($this->redirectUri),
             $this->formatScopes($this->scopes)
-        );
+        ) . \http_build_query($additionalParams);
     }
 
     /**

@@ -36,13 +36,15 @@ class EventAuthorizer
     }
 
     /**
+     * @param string $redirectUri
+     * @param array $additionalParams
      * @return string
      */
-    public function getLoginUrl()
+    public function getLoginUrl($redirectUri, $additionalParams)
     {
         return $this->authenticator->getLoginUrl([
             'https://outlook.office.com/calendars.readwrite'
-        ]);
+        ], $redirectUri, $additionalParams);
     }
 
     /**
