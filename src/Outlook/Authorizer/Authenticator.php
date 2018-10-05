@@ -87,7 +87,7 @@ class Authenticator
             $this->clientId,
             urlencode($this->redirectUri),
             $this->formatScopes($this->scopes)
-        ) . \http_build_query($additionalParams);
+        ) . "&" . \http_build_query($additionalParams);
     }
 
     /**
