@@ -55,6 +55,19 @@ class CalendarManager
     }
 
     /**
+     * @return array|Calendar
+     * @throws RestApiException
+     */
+    public function getAllCalendars()
+    {
+        $response = $this->api->call('/me/calendars', 'get');
+        if (isset($response->error)) {
+            throw new RestApiException($response->error->message, $response->statusCode);
+        }
+        return $this->parseEvents($response->value);
+    }
+
+    /**
      * @param null $eventId
      * @return array|Calendar
      * @throws RestApiException

@@ -17,7 +17,7 @@ define('APP_PASSWORD', 'qR7tHeUpDhLXiZhPdXaT5aU');
 $authenticator = new Outlook\Authorizer\Authenticator(
     APP_ID,
     APP_PASSWORD,
-    $redirectUri = "http://localhost/playground/outlook-api/examples/calendars.php"
+    $redirectUri = "http://localhost/playground/outlook-api/examples/calendar.php"
 );
 
 $sessionManager = new Session();
@@ -33,6 +33,9 @@ if (!$token) {
 
     // get all Calendars returns each item as Event object
     $calendars = $eventManager->all();
+
+    $allCalendars = $eventManager->getAllCalendars();
+    var_dump($allCalendars);
 
     foreach ($calendars as $event) {
         echo $event->id . " -> " . $event;
