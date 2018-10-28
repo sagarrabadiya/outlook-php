@@ -1,10 +1,13 @@
 # outlook-rest-php
-A handy tool to work with outlook rest api
+A handy tool to work with outlook rest api.
+
+You will need to (register)[https://github.com/microsoftgraph/msgraph-sdk-php#register-your-application]
+your application to get APP_ID (CLIENT_ID) and APP_PASSWORD (CLIENT_SECRET).
 
 ## example code is available in the examples directory
 
 #### Installation
-```bash 
+```bash
     composer require sagar/outlook-php
 ```
 
@@ -15,7 +18,7 @@ define('APP_PASSWORD', 'qR7tHeUpDhLXiZhPdXaT5aU');
 
 // redirect uri can be one of the absolute url registered with the app
 // if not given or null then it takes current url
-$authenticator = new Outlook\Authorizer\Authenticator(APP_ID, APP_PASSWORD, $redirectUri = null);
+$authenticator = new Outlook\Authorizer\Authenticator(APP_ID, APP_PASSWORD, $redirectUri = null, $tenantId = 'common');
 
 // to get token from code the below function call should be placed at the top of page
 // where redirection is coming back
@@ -39,7 +42,8 @@ define('APP_PASSWORD', 'qR7tHeUpDhLXiZhPdXaT5aU');
 $authenticator = new Outlook\Authorizer\Authenticator(
     APP_ID,
     APP_PASSWORD,
-    $redirectUri = "http://localhost/outlook-php/examples/events.php"
+    $redirectUri = "http://localhost/outlook-php/examples/events.php",
+    $tenantId = 'common'
 );
 
 // create session instance which implements SessionContract
@@ -63,7 +67,7 @@ if (!$token) {
     //if we have token we can create eventManager
     // it accepts Outlook\Authorizer\Token as argument
     $eventManager = new \Outlook\Events\EventManager($token);
-    
+
     // get all events returns each item as Event object
     $events = $eventManager->all();
 
@@ -71,11 +75,11 @@ if (!$token) {
         echo $event->id. " -> ". $event;
         echo '<br />';
     }
-    
+
     //get single event returns Outlook\Events\Event instance
     $event = $eventManager->get($eventId = 'XXXX');
     var_dump($event);
-    
+
     //create event accepts Outlook\Events\Event instance
     // nested key name must be case sensitive correctly according to their docs.
     // only outer properties will be converted to Study case automatically
@@ -85,13 +89,13 @@ if (!$token) {
     $event->end = ["DateTime" => "2014-02-02T19:00:00", "TimeZone" => "Pacific Standard Time"];
     $event = $eventManager->create($event);
     var_dump($event);
-    
+
     //update event accepts Outlook\Events\Event instance with valid id
     $event = $eventManager->get($eventId = 'XXXX');
     $event->Body->Content = "new Updated Content";
     $updateEvent = $eventManager->update($event);
     var_dump($updateEvent); // event instance with updated values
-    
+
     //delete event accepts Outlook\Events\Event instance with valid id
     $event = $eventManager->get($eventId = 'XXXX');
     $response = $eventManager->delete($event);

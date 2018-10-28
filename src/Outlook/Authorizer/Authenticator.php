@@ -29,7 +29,12 @@ class Authenticator
     /**
      * @var string
      */
-    protected $tokenUrl = "/common/oauth2/v2.0/token";
+    protected $tokenUrl = "/oauth2/v2.0/token";
+
+    /**
+     * @var string
+     */
+    protected $tenantId = "/common";
 
     /**
      * @var array
@@ -53,7 +58,7 @@ class Authenticator
      * @param null $redirectUri
      * @throws ClientException
      */
-    public function __construct($clientId = null, $clientSecret = null, $redirectUri = null)
+    public function __construct($clientId = null, $clientSecret = null, $redirectUri = null, string $tenantId = 'common')
     {
         if (is_null($clientId) || is_null($clientSecret)) {
             throw new ClientException("Client id and client secret is required for outlook!", 500, new \Exception);
@@ -61,6 +66,7 @@ class Authenticator
 
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
+        $this->tenantId = '/' . $tenantId;
         if (is_null($redirectUri)) {
             $this->redirectUri = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
             // we clean up redirect uri and remove ?code=XXX and other query string params
@@ -81,7 +87,7 @@ class Authenticator
             $this->redirectUri = $redirectUri;
         }
         $this->scopes = $this->formatScopes(array_merge($scopes, ['openid', 'offline_access']));
-        return $this->authority.sprintf(
+        return $this->authority . sprintf(
             $this->getAuthorizeUrl(),
             $this->clientId,
             urlencode($this->redirectUri),
@@ -101,8 +107,8 @@ class Authenticator
             $httpClient = new Client();
             $params = $this->buildParams($grantType, $code);
             try {
-                $response = $httpClient->post($this->authority.$this->tokenUrl, [
-                    'form_params' => $params
+                $response = $httpClient->post($this->authority . $this->tenantId . $this->tokenUrl, [
+                    'form_params' => $params,
                 ]);
                 // we got token successfully save it to session
                 $tokenResponse = $this->deserialize($response->getBody()->getContents());
@@ -133,7 +139,7 @@ class Authenticator
             "redirect_uri" => $this->redirectUri,
             "scope" => implode(" ", $this->scopes),
             "client_id" => $this->clientId,
-            "client_secret" => $this->clientSecret
+            "client_secret" => $this->clientSecret,
         ];
     }
 
@@ -142,7 +148,7 @@ class Authenticator
      */
     protected function getAuthorizeUrl()
     {
-        return '/common/oauth2/v2.0/authorize?client_id=%1$s&redirect_uri=%2$s&response_type=code&scope=%3$s';
+        return $this->tenantId . '/oauth2/v2.0/authorize?client_id=%1$s&redirect_uri=%2$s&response_type=code&scope=%3$s';
     }
 
     /**
