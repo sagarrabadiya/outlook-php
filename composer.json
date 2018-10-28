@@ -1,18 +1,28 @@
 {
     "name": "sagar/outlook-php",
     "description": "The api to handle outlook rest api using php",
-    "keywords": ["php-rest-outlook", "outlook"],
+    "keywords": [
+        "php-rest-outlook",
+        "Office356",
+        "outlook"
+    ],
     "license": "MIT",
     "type": "package",
     "authors": [
         {
             "name": "Sagar Rabadiya",
             "email": "sam.coolone70@gmail.com"
+        },
+        {
+            "name": "Tim Bernhard",
+            "email": "tim@bernhard.site"
         }
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.2",
-        "nesbot/carbon": "^1.21"
+        "nesbot/carbon": "^1.21",
+        "microsoft/microsoft-graph": "dev-master",
+        "league/oauth2-client": "dev-master"
     },
     "autoload": {
         "psr-4": {
