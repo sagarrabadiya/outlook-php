@@ -9,7 +9,6 @@ namespace Outlook\Events;
 use Outlook\Authorizer\Authenticator;
 use Outlook\Authorizer\Contracts\SessionContract;
 use Outlook\Authorizer\Token;
-use Outlook\Exceptions\Authorizer\ClientException;
 
 class EventAuthorizer
 {
@@ -41,14 +40,15 @@ class EventAuthorizer
     public function getLoginUrl()
     {
         return $this->authenticator->getLoginUrl([
-            'https://outlook.office.com/calendars.readwrite'
+            'https://outlook.office.com/calendars.readwrite',
         ]);
     }
 
     /**
+     * @param string|null $code
      * @return bool|Token
      */
-    public function isAuthenticated()
+    public function isAuthenticated($code = null)
     {
         $token = $this->sessionManager->get();
         if ($token && !$token->isExpired()) {
@@ -57,6 +57,6 @@ class EventAuthorizer
         // we clean up any existing expired token
         $this->sessionManager->remove();
         // if not in session we capture code parameter and send request to get token
-        return $this->authenticator->getToken();
+        return $this->authenticator->getToken($code);
     }
 }

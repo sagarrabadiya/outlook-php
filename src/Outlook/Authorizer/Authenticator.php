@@ -7,6 +7,8 @@ use Outlook\Exceptions\Authorizer\TokenException;
 
 /**
  * Class Authenticator
+ * Authenticate as a user
+ *
  * @package Outlook
  */
 class Authenticator
@@ -96,13 +98,16 @@ class Authenticator
     }
 
     /**
+     * @param string $code
      * @return bool|Token
      * @throws TokenException
      */
-    public function getToken()
+    public function getToken($code = null)
     {
         $grantType = 'authorization_code';
-        $code = (isset($_GET['code'])) ? $_GET['code'] : null;
+        if (!$code) {
+            $code = (isset($_GET['code'])) ? $_GET['code'] : null;
+        }
         if ($code) {
             $httpClient = new Client();
             $params = $this->buildParams($grantType, $code);
