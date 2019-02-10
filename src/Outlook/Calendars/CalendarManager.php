@@ -8,7 +8,7 @@ namespace Outlook\Calendars;
 
 use Outlook\ApiRequester\Client;
 use Outlook\Authorizer\Token;
-use Outlook\Exceptions\Calenders\RestApiException;
+use Outlook\Exceptions\Events\RestApiException;
 
 class CalendarManager
 {
